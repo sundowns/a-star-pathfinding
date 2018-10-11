@@ -1,3 +1,6 @@
+//https://www.khanacademy.org/computing/computer-science/algorithms/graph-representation/a/representing-graphs
+//^Useful docs on representing graphs rather than a simple grid
+
 // End Class Definitions
 class Cell {
     constructor(x, y, colour) {
@@ -8,11 +11,19 @@ class Cell {
         this.f = 0;
         this.g = 0;
         this.h = 0;
+        this.neighbours = [];
 
         this.show = (colour) => {
             fill(colour);
             noStroke();
             rect(this.x*cell_w, this.y*cell_h, cell_w-1, cell_h-1);
+        }
+
+        this.addNeighbours = function(inGrid) {
+            if (this.x < cols - 1) this.neighbours.push(inGrid[this.x + 1][this.y]);
+            if (this.x > 0)        this.neighbours.push(inGrid[this.x - 1][this.y]);
+            if (this.y < rows - 1) this.neighbours.push(inGrid[this.x][this.y + 1]);
+            if (this.y > 0)        this.neighbours.push(inGrid[this.x][this.y - 1]);
         }
     }
 }
@@ -43,22 +54,23 @@ function setup() {
         }
     }
 
+    for (var i = 0; i < cols; i++) {
+        for (var j = 0; j < rows; j++) {
+            grid[i][j].addNeighbours(grid);
+        }
+    }
+
     start = grid[0][0];
     end = grid[cols-1][rows-1];
 
     openSet.push(start);
 
-
-    console.log(grid)
+    console.log(grid);
 }
 
 function draw() { 
-    if (openSet.length > 0) {
-        //TODO: https://www.youtube.com/watch?v=aKYlikFAV4k&t=22m10s
-    } else {
-        // no solution
-    }
-
+    aStarStep();
+    //TODO: 32:39 into the vid https://www.youtube.com/watch?v=aKYlikFAV4k
     background(0);
 
     for (var i = 0; i < cols; i++) {
@@ -76,3 +88,34 @@ function draw() {
     });
 }
 
+const removeFromArray = (array, element) => {
+    array.splice(array.lastIndexOf(element), 1); 
+}
+
+const getCurrentWinner = () => {
+    var winner = 0;
+    for (var i = 0; i < openSet.length; i++) {
+        if (openSet[i].f < openSet[winner].f) {
+            winner = i;
+        }
+    }
+    return winner;
+}
+
+const aStarStep = () => {
+    if (openSet.length > 0) {
+        var winner = getCurrentWinner();
+
+        var current = openSet[winner];
+
+        if (current === end) {
+            console.log("DONE!")
+        }
+
+        removeFromArray(openSet, current);
+        closedSet.push(current);
+
+    } else {
+        // no solution
+    }
+}

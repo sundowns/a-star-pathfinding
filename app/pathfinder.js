@@ -1,6 +1,22 @@
 //https://www.khanacademy.org/computing/computer-science/algorithms/graph-representation/a/representing-graphs
 //^Useful docs on representing graphs rather than a simple grid
 
+
+// Globals
+const wallChance = 0.3;
+const cols = 40;
+const rows = 40;
+const grid = new Array(cols);
+var cell_w;
+var cell_h;
+
+// A* Specific
+var openSet = [];
+var closedSet = []; 
+var start;
+var end;
+var path = [];
+
 // End Class Definitions
 class Cell {
     constructor(x, y, colour) {
@@ -15,7 +31,7 @@ class Cell {
         this.previous = null;
         this.wall = false;
 
-        if (random(1) < 0.3) {
+        if (random(1) < wallChance && abs(x+y) > 4) {
             this.wall = true;
         }
 
@@ -37,19 +53,6 @@ class Cell {
     }
 }
 
-// Globals
-const cols = 30;
-const rows = 30;
-const grid = new Array(cols);
-var cell_w;
-var cell_h;
-
-// A* Specific
-var openSet = [];
-var closedSet = []; 
-var start;
-var end;
-var path = [];
 
 function setup() {
     createCanvas(400, 400)

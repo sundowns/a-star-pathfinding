@@ -3,7 +3,7 @@
 
 
 // Globals
-const wallChance = 0.3;
+const wallChance = 0.2;
 const cols = 40;
 const rows = 40;
 const grid = new Array(cols);
@@ -58,28 +58,7 @@ function setup() {
     createCanvas(400, 400)
     cell_w = width / cols;
     cell_h = height / rows;
-
-    console.log(`Pathfinder generating a ${cols}x${rows} grid`)
-    for (var i = 0; i < cols; i++) {
-        grid[i] = new Array(rows)
-        for (var j = 0; j < rows; j++) {
-            grid[i][j] = new Cell(i, j);
-        }
-    }
-
-    for (var i = 0; i < cols; i++) {
-        for (var j = 0; j < rows; j++) {
-            grid[i][j].addNeighbours(grid);
-        }
-    }
-
-    start = grid[0][0];
-    end = grid[randomIntBetween(Math.floor(cols/2), cols-1)][randomIntBetween(Math.floor(rows/2), rows-1)]
-    end.wall = false;
-
-    openSet.push(start);
-
-    console.log(grid);
+    generateGrid(0, 0);
 }
 
 function draw() { 
@@ -105,6 +84,17 @@ function draw() {
     });
 
     end.show(color(255,0,255));
+}
+
+function mousePressed() {
+    let newX = Math.floor(mouseX/cell_w);
+    let newY = Math.floor(mouseY/cell_h);
+    if (newX >= 0 && newX <= cols -1 && 
+        newY >= 0 && newY <= rows -1) {
+            loop();
+            generateGrid(newX, newY);
+        }
+    return false;
 }
 
 const removeFromArray = (array, element) => {
@@ -139,6 +129,31 @@ const evaluatePath = (current) => {
     }
 }
 
+const generateGrid = (startX, startY) => {
+    console.log(`Pathfinder generating a ${cols}x${rows} grid`)
+    for (var i = 0; i < cols; i++) {
+        grid[i] = new Array(rows)
+        for (var j = 0; j < rows; j++) {
+            grid[i][j] = new Cell(i, j);
+        }
+    }
+
+    for (var i = 0; i < cols; i++) {
+        for (var j = 0; j < rows; j++) {
+            grid[i][j].addNeighbours(grid);
+        }
+    }
+
+    start = grid[startX][startY];
+    end = grid[randomIntBetween(Math.floor(cols/2), cols-1)][randomIntBetween(Math.floor(rows/2), rows-1)]
+    end.wall = false;
+
+    openSet = [];
+    closedSet = [];
+
+    openSet.push(start);
+}
+
 const aStarStep = () => {
     if (openSet.length > 0) {
         var winner = getCurrentWinner();
@@ -147,7 +162,7 @@ const aStarStep = () => {
         evaluatePath(current);
         if (current === end) {
             noLoop();
-            console.log("DONE!");
+            console.log('%c DONE!', 'color: green; font: bold; font-size: xx-large');
         }
 
         removeFromArray(openSet, current);
@@ -173,7 +188,7 @@ const aStarStep = () => {
         })
 
     } else {
-        console.log("No Solution :(!")
+        console.log('%c NO SOLUTION :(', 'color: red; font: bold; font-size: xx-large');
         // no solution
     }
 }
